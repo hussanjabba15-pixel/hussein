@@ -1,0 +1,25 @@
+from telegram import Update
+from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
+
+TOKEN = "8412138819:AAGBTCr8OOZ4IzmEzJh_WnIWzPxKDn4-zCU"
+
+SOURCE_CHANNEL_ID = -1003841820625    # القناة الأصلية
+BACKUP_CHANNEL_ID = -1003700530647    # قناة النسخة الاحتياطية
+
+async def mirror_channel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.channel_post:
+        try:
+            await update.channel_post.copy(
+                chat_id=BACKUP_CHANNEL_ID
+            )
+        except Exception as e:
+            print("Error:", e)
+
+app = ApplicationBuilder().token(TOKEN).build()
+
+app.add_handler(
+    MessageHandler(filters.Chat(SOURCE_CHANNEL_ID), mirror_channel)
+)
+
+print("✅ Bot is running and mirroring...")
+app.run_polling()
